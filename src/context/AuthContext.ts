@@ -25,6 +25,8 @@ const reducer: Reducer<InitState, { type: Action, payload?: string }> = (state, 
     case 'setRoomId':
       return { ...state, roomId: action.payload || '' }
     case 'resetState':
+      Cookie.remove('account')
+      Cookie.remove('token')
       return { token: '', account: '', roomId: '' }
     default:
       return state

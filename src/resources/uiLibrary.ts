@@ -87,10 +87,6 @@ export const StyledBorderedTitle = styled(StyledTitle)`
   padding: 24px 18px 24px;
 `
 
-export const StyledChat = styled.div`
-
-`
-
 export const StyledChatContainer = styled.div`
   padding: 24px;
 `
@@ -119,4 +115,44 @@ export const StyledChatInputContainer = styled.div`
     height: 36px;
     font-size: 24px;
   }
+`
+
+export const StyledChatMsgBlock = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+`
+
+export const StyledChatMsgName = styled.span<{ $type: 'self' | 'others' | 'connected' }>`
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: ${props => {
+    switch (props.$type) {
+      case 'self':
+        return "#EE4921"
+      case 'others':
+        return "#FFC133"
+      case 'connected':
+        return '#23EC41'
+      default:
+        return '#ffffff'
+    }
+  }}`
+
+export const StyledChatMsgContent = styled.span<{ $type: 'self' | 'others' | 'connected' }>`
+  font-size: 16px;
+  color: #eee;
+  line-height: 1;
+  margin-left: 4px;
+  color: ${props => {
+    switch (props.$type) {
+      case 'connected':
+        return '#23EC41'
+      case 'self':
+      case 'others':
+      default:
+        return '#ffffff'
+    }
+  }}
 `

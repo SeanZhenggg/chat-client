@@ -1,16 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ws from '../ws'
 import { useAuthContext } from '../context/AuthContext'
-import { StyledChatContainer, StyledChat, StyledBorderedTitle, StyledChatContent, StyledInput, StyledChatInputContainer } from '../resources/uiLibrary'
+import {
+  StyledChatContainer,
+  StyledBorderedTitle,
+  StyledChatContent,
+  StyledInput,
+  StyledChatInputContainer,
+  StyledChatMsgBlock,
+  StyledChatMsgName,
+  StyledChatMsgContent
+} from '../resources/uiLibrary'
 import { useForm } from 'react-hook-form'
 import { WsMsgFormat } from '../types'
+
+const getMsgType = (event: WsMsgFormat, currentAcc: string) => {
+  if (event.message === '已連線') return 'connected'
+  if (event.account === currentAcc) return 'self'
+  return 'others'
+}
+
 const Chat: React.FC = () => {
   const init = useRef(false)
-  const [ctx] = useAuthContext()
+  const [ctx, dispatch] = useAuthContext()
   const { register, watch, reset } = useForm()
   const message = watch("message")
   const isComposition = useRef(false)
-  const [messages, setMessages] = useState<WsMsgFormat[]>([])
+  const [messages, setMessages] = useState<(WsMsgFormat & { type: 'self' | 'others' | 'connected' })[]>([])
 
   useEffect(() => {
     if(init.current) return   
@@ -21,11 +37,14 @@ const Chat: React.FC = () => {
       token: ctx.token,
       roomId: ctx.roomId
     })
+    ws.setOnCloseCallback(() => {
+      
+      dispatch({ type: 'resetState' })
+    })
     ws.connect()
 
     ws.subscribe({ roomId: ctx.roomId }, (event) => {
-      console.log('⛔️⛔️⛔️⛔️⛔️', event)
-      setMessages(prev => [...prev, event])
+      setMessages(prev => [...prev, { ...event, type: getMsgType(event, ctx.account) }])
     })
     init.current = true
   }, [ctx])
@@ -55,13 +74,16 @@ const Chat: React.FC = () => {
   }
 
   return (
-    <StyledChat>
+    <>
       <StyledBorderedTitle>{ctx.roomId} 號聊天室</StyledBorderedTitle>
 
       <StyledChatContainer>
         <StyledChatContent>
           {messages.map((e, idx) => 
-            <p key={`${idx}-${e.account}-${e.message}`}>{e.nickname} : {e.message}</p>
+            <StyledChatMsgBlock key={`${idx}-${e.account}-${e.message}`}>
+              <StyledChatMsgName $type={e.type}>{e.nickname}</StyledChatMsgName>
+              <StyledChatMsgContent $type={e.type}>{e.message}</StyledChatMsgContent>
+            </StyledChatMsgBlock>
           )}
         </StyledChatContent>
       </StyledChatContainer>
@@ -74,7 +96,7 @@ const Chat: React.FC = () => {
           {...register('message')}
         />
       </StyledChatInputContainer>
-    </StyledChat>
+    </>
   )
 }
 

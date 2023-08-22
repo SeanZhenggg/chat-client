@@ -26,6 +26,7 @@ class WebSocketMaster {
   socket: WebSocket | null = null
   observables: WsObservables<string, WsMsgFormat>
   listeners: { [k: string]: Array<Listener> } = {}
+  onCloseCallback?: (...args: any[]) => void
 
   constructor(props: { url: string }) {
     this.url = props.url
@@ -47,6 +48,7 @@ class WebSocketMaster {
       console.debug('ws connected.', e)
     }
     this.socket.onclose = e => {
+      this.onCloseCallback && this.onCloseCallback()
       console.debug('ws on closed.', e)
     }
     this.socket.onerror = e => {
@@ -115,6 +117,10 @@ class WebSocketMaster {
     this.socket?.send(value.message)
     const res = await this.waitSync({ roomId: value.roomId, pairId: value.account })
     return res
+  }
+
+  setOnCloseCallback(callback: (...args: any[]) => void) {
+    this.onCloseCallback = callback
   }
 }
 

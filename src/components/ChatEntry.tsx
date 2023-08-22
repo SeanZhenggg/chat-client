@@ -1,8 +1,6 @@
 import { FieldValues, useForm } from 'react-hook-form'
 import { StyledContainer, StyledForm, StyledButton, StyledLabel, StyledInput, StyledTitle, StyledFlexAroundContainer } from '../resources/uiLibrary'
 import { useAuthContext } from '../context/AuthContext'
-import Cookie from 'js-cookie'
-
 const ChatEntry: React.FC = () => {
   const { register, handleSubmit } = useForm()
   const [, dispatch] = useAuthContext()
@@ -13,8 +11,6 @@ const ChatEntry: React.FC = () => {
 
   const onGoBackToLogin = () => {
     dispatch({ type: 'resetState' })
-    Cookie.remove('account')
-    Cookie.remove('token')
   }
   return (
     <StyledContainer>
