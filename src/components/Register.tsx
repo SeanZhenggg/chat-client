@@ -29,12 +29,7 @@ const Login: React.FC = () => {
     const response = await result.json()
     if (result.status !== 200) {
       setSuccess('')
-
-      if (response.status === 11000) {
-        setError('帳號或暱稱重複')
-      } else {
-        setError('未知錯誤')
-      }
+      setError(response?.message)
       return
     }
 

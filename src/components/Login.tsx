@@ -27,12 +27,13 @@ const Login: React.FC = () => {
       nickname: data.nickname
     })
     
+    
+    const response = await result.json()
+
     if (result.status !== 200) {
-      setError('帳號密碼錯誤')
+      setError(response?.message)
       return
     }
-
-    const response = await result.json()
     dispatch({ type: 'setAccount', payload: data.account })
     dispatch({ type: 'setToken', payload: response?.data })
   }
